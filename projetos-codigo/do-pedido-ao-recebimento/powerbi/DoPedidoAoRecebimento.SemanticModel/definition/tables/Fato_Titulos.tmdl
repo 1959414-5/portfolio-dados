@@ -1,0 +1,138 @@
+table Fato_Titulos
+	lineageTag: 9e67f2e9-ff49-419c-94dd-81b1ac0089a5
+
+	column TituloID
+		dataType: int64
+		formatString: 0
+		lineageTag: a82d7e18-623b-44d1-86c1-3eca8d823912
+		summarizeBy: none
+		sourceColumn: TituloID
+
+	column PedidoID
+		dataType: int64
+		formatString: 0
+		lineageTag: 7eb51f71-aab5-418f-bde7-5975ea0982ab
+		summarizeBy: none
+		sourceColumn: PedidoID
+
+	column Parcela
+		dataType: int64
+		formatString: 0
+		lineageTag: 24a6f603-df1c-45b6-b6c3-e61f0055b66e
+		summarizeBy: none
+		sourceColumn: Parcela
+
+	column ClienteID
+		dataType: int64
+		formatString: 0
+		lineageTag: c8af6300-d228-4b6b-8acd-6a038211bc54
+		summarizeBy: none
+		sourceColumn: ClienteID
+
+	column DataEmissao
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 53321ec7-50c5-4cb4-a26c-2713ce7e069c
+		summarizeBy: none
+		sourceColumn: DataEmissao
+
+	column DataVencimento
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: f697b301-4063-4841-9184-b20d583ec906
+		summarizeBy: none
+		sourceColumn: DataVencimento
+
+	column DataPagamento
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 177e876d-719f-4019-8930-8204b1887e19
+		summarizeBy: none
+		sourceColumn: DataPagamento
+
+	column Valor
+		dataType: double
+		formatString: #,0.00
+		lineageTag: c0b42ffc-1c9a-4da1-aced-c7e4433110a2
+		summarizeBy: none
+		sourceColumn: Valor
+
+	column Situacao
+		dataType: string
+		lineageTag: 6a088326-fba8-463a-ba99-17d2a3673a39
+		summarizeBy: none
+		sourceColumn: Situacao
+
+	column DiasAtraso
+		dataType: int64
+		formatString: 0
+		lineageTag: 3aaa5e0f-47f7-4a1a-8729-c155bf86855b
+		summarizeBy: none
+		sourceColumn: DiasAtraso
+
+	column FaixaAtraso
+		dataType: string
+		lineageTag: 5495249f-f844-4456-9bb8-0445c7fa65d3
+		summarizeBy: none
+		sourceColumn: FaixaAtraso
+		sortByColumn: FaixaOrdem
+
+	column FaixaOrdem
+		dataType: int64
+		formatString: 0
+		lineageTag: d8282dbc-793e-40ad-b7dd-5b01a33ec8b0
+		summarizeBy: none
+		sourceColumn: FaixaOrdem
+
+	measure 'Valor Faturado' = SUM(Fato_Titulos[Valor])
+		formatString: \R\$ #,0
+		lineageTag: d55c959c-5e4e-4e20-ab2d-14c5698645f9
+		displayFolder: Financeiro
+
+	measure 'Valor Recebido' = CALCULATE(SUM(Fato_Titulos[Valor]), Fato_Titulos[Situacao] = "Pago")
+		formatString: \R\$ #,0
+		lineageTag: 26f0ceb2-7247-4b8d-86ab-cbabcd27a4d6
+		displayFolder: Financeiro
+
+	measure 'Valor em Aberto' = CALCULATE(SUM(Fato_Titulos[Valor]), Fato_Titulos[Situacao] <> "Pago")
+		formatString: \R\$ #,0
+		lineageTag: 7680bde3-4b47-444b-b98a-2c30d8ad5f23
+		displayFolder: Financeiro
+
+	measure 'Valor Vencido' = CALCULATE(SUM(Fato_Titulos[Valor]), Fato_Titulos[Situacao] = "Vencido")
+		formatString: \R\$ #,0
+		lineageTag: 143215b3-71e5-43c8-a296-e728df5e1324
+		displayFolder: Financeiro
+
+	measure 'Base Já Vencida' =
+			VAR Corte = [Data de Corte]
+			RETURN CALCULATE(SUM(Fato_Titulos[Valor]), Fato_Titulos[DataVencimento] <= Corte)
+		formatString: \R\$ #,0
+		lineageTag: a7608e31-14f0-4cf6-988c-7cdf9e20e62e
+		displayFolder: Financeiro
+
+	measure 'Inadimplência %' = DIVIDE([Valor Vencido], [Base Já Vencida])
+		formatString: 0.0%
+		lineageTag: 383d7f08-702c-44db-a763-2d9807515242
+		displayFolder: Financeiro
+
+	measure 'Atraso Médio (dias)' = CALCULATE(AVERAGE(Fato_Titulos[DiasAtraso]), Fato_Titulos[Situacao] = "Pago")
+		formatString: #,0.0
+		lineageTag: cf09dbda-f727-42fb-92c8-990dbaa96f08
+		displayFolder: Financeiro
+
+	measure 'Clientes com Título Vencido' = CALCULATE(DISTINCTCOUNT(Fato_Titulos[ClienteID]), Fato_Titulos[Situacao] = "Vencido")
+		formatString: #,0
+		lineageTag: 64738bda-9bb7-43f9-8f5c-d0a5f3019805
+		displayFolder: Financeiro
+
+	partition Fato_Titulos = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents(PastaDados & "fato_titulos.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Cabecalho = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    SemVazios = Table.ReplaceValue(Cabecalho, "", null, Replacer.ReplaceValue, {"DataPagamento", "DiasAtraso"}),
+				    Tipos = Table.TransformColumnTypes(SemVazios, {{"TituloID", Int64.Type}, {"PedidoID", Int64.Type}, {"Parcela", Int64.Type}, {"ClienteID", Int64.Type}, {"DataEmissao", type date}, {"DataVencimento", type date}, {"DataPagamento", type date}, {"Valor", type number}, {"Situacao", type text}, {"DiasAtraso", Int64.Type}, {"FaixaAtraso", type text}, {"FaixaOrdem", Int64.Type}}, "en-US")
+				in
+				    Tipos

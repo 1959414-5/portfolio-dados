@@ -1,0 +1,31 @@
+table Dim_Vendedor
+	lineageTag: b0df442f-f22f-47cf-afca-20e153607da3
+
+	column VendedorID
+		dataType: int64
+		formatString: 0
+		lineageTag: 0c75b6ac-b51f-47e0-a400-61cb92005c67
+		summarizeBy: none
+		sourceColumn: VendedorID
+
+	column Vendedor
+		dataType: string
+		lineageTag: 9c1ea398-7b83-4c3f-a6e4-5a74447ff42a
+		summarizeBy: none
+		sourceColumn: Vendedor
+
+	column Regiao
+		dataType: string
+		lineageTag: 5d3a5d9c-3757-4687-85cc-5ba1077ecd33
+		summarizeBy: none
+		sourceColumn: Regiao
+
+	partition Dim_Vendedor = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents(PastaDados & "dim_vendedor.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Cabecalho = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    Tipos = Table.TransformColumnTypes(Cabecalho, {{"VendedorID", Int64.Type}, {"Vendedor", type text}, {"Regiao", type text}}, "en-US")
+				in
+				    Tipos

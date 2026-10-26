@@ -1,0 +1,196 @@
+table Fato_Vendas
+	lineageTag: 3cb9e90a-a70f-4412-acf6-6c86a818ff17
+
+	column PedidoID
+		dataType: int64
+		formatString: 0
+		lineageTag: 0dccec92-8d87-4f39-965a-90aa16127401
+		summarizeBy: none
+		sourceColumn: PedidoID
+
+	column Data
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: fcdfeff3-d5fa-4aba-9477-44cf4b5524f1
+		summarizeBy: none
+		sourceColumn: Data
+
+	column ClienteID
+		dataType: int64
+		formatString: 0
+		lineageTag: 6afb031e-c5a0-48c3-a1f8-1d4bfdab85ec
+		summarizeBy: none
+		sourceColumn: ClienteID
+
+	column VendedorID
+		dataType: int64
+		formatString: 0
+		lineageTag: 04d052f9-9765-4a5a-b4e2-3f387f8d8802
+		summarizeBy: none
+		sourceColumn: VendedorID
+
+	column ProdutoID
+		dataType: int64
+		formatString: 0
+		lineageTag: da634400-2a87-4111-a7b7-5592a74ad4b6
+		summarizeBy: none
+		sourceColumn: ProdutoID
+
+	column Quantidade
+		dataType: int64
+		formatString: 0
+		lineageTag: dd43c630-9758-4781-be9f-9575e2c9f62c
+		summarizeBy: none
+		sourceColumn: Quantidade
+
+	column PrecoLista
+		dataType: double
+		formatString: #,0.00
+		lineageTag: cd72e7c4-25b3-425d-8bb8-7835b65ff466
+		summarizeBy: none
+		sourceColumn: PrecoLista
+
+	column PrecoUnitario
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 3a9568fe-7039-4f16-a97b-5d00cf628663
+		summarizeBy: none
+		sourceColumn: PrecoUnitario
+
+	column ValorBruto
+		dataType: double
+		formatString: #,0.00
+		lineageTag: f98ad499-7c2c-4c08-9784-242a6de44eab
+		summarizeBy: none
+		sourceColumn: ValorBruto
+
+	column Receita
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 8e6357cc-6f98-4804-923e-4b62bac024f8
+		summarizeBy: none
+		sourceColumn: Receita
+
+	column Custo
+		dataType: double
+		formatString: #,0.00
+		lineageTag: d98d6052-45e2-4e53-a294-4017d01417f6
+		summarizeBy: none
+		sourceColumn: Custo
+
+	column DescontoPct
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 72f0ddd9-4d33-4b5c-9b45-486095401142
+		summarizeBy: none
+		sourceColumn: DescontoPct
+
+	measure 'Receita Total' = SUM(Fato_Vendas[Receita])
+		formatString: \R\$ #,0
+		lineageTag: 907fbba4-71a4-46f9-8678-6cdfaf33e46a
+		displayFolder: Vendas
+
+	measure 'Custo Total' = SUM(Fato_Vendas[Custo])
+		formatString: \R\$ #,0
+		lineageTag: c722a5dc-7baa-4c5c-8561-9f3af6219684
+		displayFolder: Vendas
+
+	measure 'Margem Bruta' = [Receita Total] - [Custo Total]
+		formatString: \R\$ #,0
+		lineageTag: 652b5bc2-e17a-4630-991b-a1edd8ae54ee
+		displayFolder: Vendas
+
+	measure 'Margem Bruta %' = DIVIDE([Margem Bruta], [Receita Total])
+		formatString: 0.0%
+		lineageTag: 982b746b-0c9b-48f3-b207-3949496d5e33
+		displayFolder: Vendas
+
+	measure Pedidos = DISTINCTCOUNT(Fato_Vendas[PedidoID])
+		formatString: #,0
+		lineageTag: 38f914b0-2f8a-4dfa-b07f-00048c438e97
+		displayFolder: Vendas
+
+	measure 'Ticket Médio' = DIVIDE([Receita Total], [Pedidos])
+		formatString: \R\$ #,0
+		lineageTag: 1f251319-cb83-4d25-a8a6-54e1f1790f13
+		displayFolder: Vendas
+
+	measure 'Clientes Ativos' = DISTINCTCOUNT(Fato_Vendas[ClienteID])
+		formatString: #,0
+		lineageTag: 3f402134-7de7-4382-bafd-8dcb43365b1c
+		displayFolder: Vendas
+
+	measure 'Desconto Médio %' = 1 - DIVIDE([Receita Total], SUM(Fato_Vendas[ValorBruto]))
+		formatString: 0.0%
+		lineageTag: 1c94db95-3f32-4cda-9481-29776e4f4059
+		displayFolder: Vendas
+
+	measure 'Receita Ano Anterior' = CALCULATE([Receita Total], SAMEPERIODLASTYEAR(Dim_Calendario[Data]))
+		formatString: \R\$ #,0
+		lineageTag: 2d88dd5d-19f8-42c1-89e5-71aecfad3750
+		displayFolder: Vendas
+
+	measure 'Variação vs Ano Anterior %' = DIVIDE([Receita Total] - [Receita Ano Anterior], [Receita Ano Anterior])
+		formatString: 0.0%
+		lineageTag: 6f6d3465-0379-4763-8185-50c406b5958a
+		displayFolder: Vendas
+
+	measure 'Receita Acumulada no Ano' = TOTALYTD([Receita Total], Dim_Calendario[Data])
+		formatString: \R\$ #,0
+		lineageTag: 52a3802c-190f-4eef-b083-df86c07eb74d
+		displayFolder: Vendas
+
+	measure 'Meta de Receita' = SUM(Fato_Metas[MetaReceita])
+		formatString: \R\$ #,0
+		lineageTag: 86287d2d-3c5a-43e3-99e0-837d14130fab
+		displayFolder: Metas
+
+	measure 'Atingimento da Meta %' = DIVIDE([Receita Total], [Meta de Receita])
+		formatString: 0.0%
+		lineageTag: 32eb5433-cc3a-4561-8b8d-326de7f9885e
+		displayFolder: Metas
+
+	measure 'Data de Corte' = DATE(2025, 12, 31)
+		formatString: dd/mm/yyyy
+		lineageTag: f4f9282e-9093-4936-bd84-93be20f42295
+		displayFolder: CRM
+
+	measure 'Última Compra' = CALCULATE(MAX(Fato_Vendas[Data]), ALL(Dim_Calendario))
+		formatString: dd/mm/yyyy
+		lineageTag: d7741786-6e01-4bf5-8c1e-3f21e73ee951
+		displayFolder: CRM
+
+	measure 'Recência (dias)' = DATEDIFF([Última Compra], [Data de Corte], DAY)
+		formatString: #,0
+		lineageTag: 1fd27893-6fc5-4c0a-9289-406eab95a216
+		displayFolder: CRM
+
+	measure 'Rank do Cliente' = RANKX(ALLSELECTED(Dim_Cliente[Cliente]), [Receita Total], , DESC, DENSE)
+		formatString: #,0
+		lineageTag: f023bf3a-5179-4db8-aad6-f2e7a156f6ac
+		displayFolder: Curva ABC
+
+	measure 'Receita Acumulada %' =
+			VAR Atual = [Receita Total]
+			VAR Clientes = ALLSELECTED(Dim_Cliente[Cliente])
+			VAR Acumulado = SUMX(FILTER(Clientes, [Receita Total] >= Atual), [Receita Total])
+			RETURN DIVIDE(Acumulado, CALCULATE([Receita Total], ALLSELECTED(Dim_Cliente)))
+		formatString: 0.0%
+		lineageTag: 410f9311-0a21-4056-9a19-fe16844a1e94
+		displayFolder: Curva ABC
+
+	measure 'Classe ABC' =
+			VAR Acum = [Receita Acumulada %]
+			RETURN IF(ISBLANK([Receita Total]), BLANK(), IF(Acum <= 0.8, "A", IF(Acum <= 0.95, "B", "C")))
+		lineageTag: 0d278601-3c23-47b9-9eef-6bee0bcd1738
+		displayFolder: Curva ABC
+
+	partition Fato_Vendas = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents(PastaDados & "fato_vendas.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Cabecalho = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    Tipos = Table.TransformColumnTypes(Cabecalho, {{"PedidoID", Int64.Type}, {"Data", type date}, {"ClienteID", Int64.Type}, {"VendedorID", Int64.Type}, {"ProdutoID", Int64.Type}, {"Quantidade", Int64.Type}, {"PrecoLista", type number}, {"PrecoUnitario", type number}, {"ValorBruto", type number}, {"Receita", type number}, {"Custo", type number}, {"DescontoPct", type number}}, "en-US")
+				in
+				    Tipos

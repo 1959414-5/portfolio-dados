@@ -1,0 +1,88 @@
+table Dim_Cliente
+	lineageTag: 5efb9e90-8e6b-4637-bd5a-b585c323b97e
+
+	column ClienteID
+		dataType: int64
+		formatString: 0
+		lineageTag: 4ccd7f0b-b056-4714-985a-40f66a7c29d9
+		summarizeBy: none
+		sourceColumn: ClienteID
+
+	column Cliente
+		dataType: string
+		lineageTag: 8d0aab13-2407-48a4-8458-168e86751fef
+		summarizeBy: none
+		sourceColumn: Cliente
+
+	column Segmento
+		dataType: string
+		lineageTag: b3525de9-5500-497c-97eb-7fcfc2ec796c
+		summarizeBy: none
+		sourceColumn: Segmento
+
+	column Porte
+		dataType: string
+		lineageTag: 0a0f6bb7-0d84-4198-9de5-74eb72020afd
+		summarizeBy: none
+		sourceColumn: Porte
+
+	column Regiao
+		dataType: string
+		lineageTag: 010b7bf1-31da-4770-8ccb-3ab0954a6232
+		summarizeBy: none
+		sourceColumn: Regiao
+
+	column UF
+		dataType: string
+		lineageTag: fe617844-c092-4ef8-a905-80f62e95913d
+		summarizeBy: none
+		sourceColumn: UF
+
+	column Cidade
+		dataType: string
+		lineageTag: e9683bd4-ac69-428e-816a-89ed73546863
+		summarizeBy: none
+		sourceColumn: Cidade
+
+	column VendedorID
+		dataType: int64
+		formatString: 0
+		lineageTag: fa59af7c-3d9b-4c1e-a690-7ffeff441f40
+		summarizeBy: none
+		sourceColumn: VendedorID
+
+	column DataCadastro
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: 61e05dcc-9878-4e14-a42c-923880804983
+		summarizeBy: none
+		sourceColumn: DataCadastro
+
+	column 'Segmento CRM' =
+			VAR Ultima = CALCULATE(MAX(Fato_Vendas[Data]))
+			VAR Rec = DATEDIFF(Ultima, DATE(2025, 12, 31), DAY)
+			VAR Ped = CALCULATE(DISTINCTCOUNT(Fato_Vendas[PedidoID]))
+			RETURN SWITCH(TRUE(), ISBLANK(Ultima), "Sem compras", Rec > 180, "Perdido", Rec > 90, "Em risco", Ped >= 15, "Fiel", "Ativo")
+		dataType: string
+		lineageTag: 6b544ad2-c7e4-4a97-b526-e384163a5906
+		summarizeBy: none
+
+	measure Clientes = DISTINCTCOUNT(Dim_Cliente[ClienteID])
+		formatString: #,0
+		lineageTag: 306ae113-30be-4a09-9e4d-2e8991cdab84
+		displayFolder: CRM
+
+	measure 'Clientes Inativos (+90 dias)' = COUNTROWS(FILTER(VALUES(Dim_Cliente[ClienteID]), NOT ISBLANK([Última Compra]) && [Recência (dias)] > 90))
+		formatString: #,0
+		lineageTag: fe357e43-f5ed-421c-b9be-2218f80c44ff
+		displayFolder: CRM
+
+	partition Dim_Cliente = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents(PastaDados & "dim_cliente.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Cabecalho = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    Tipos = Table.TransformColumnTypes(Cabecalho, {{"ClienteID", Int64.Type}, {"Cliente", type text}, {"Segmento", type text}, {"Porte", type text}, {"Regiao", type text}, {"UF", type text}, {"Cidade", type text}, {"VendedorID", Int64.Type}, {"DataCadastro", type date}}, "en-US")
+				in
+				    Tipos

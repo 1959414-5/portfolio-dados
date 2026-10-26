@@ -1,0 +1,33 @@
+table Fato_Metas
+	lineageTag: 5f8a12a5-a175-4491-b76d-c44cf0bac356
+
+	column DataMes
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		lineageTag: e4fe0e09-39a5-49fc-8dd8-c0bd37423d04
+		summarizeBy: none
+		sourceColumn: DataMes
+
+	column VendedorID
+		dataType: int64
+		formatString: 0
+		lineageTag: f6328bcd-a88b-4762-af9e-8aed4a8f2a4b
+		summarizeBy: none
+		sourceColumn: VendedorID
+
+	column MetaReceita
+		dataType: double
+		formatString: #,0.00
+		lineageTag: eb357c64-0463-4bf8-8fb8-619c4f419ab1
+		summarizeBy: none
+		sourceColumn: MetaReceita
+
+	partition Fato_Metas = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents(PastaDados & "fato_metas.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Cabecalho = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    Tipos = Table.TransformColumnTypes(Cabecalho, {{"DataMes", type date}, {"VendedorID", Int64.Type}, {"MetaReceita", type number}}, "en-US")
+				in
+				    Tipos

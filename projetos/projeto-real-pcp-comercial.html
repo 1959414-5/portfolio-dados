@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gestão integrada de pedidos, produção e carteira de clientes | Bárbara Paschoalin</title>
+<meta name="description" content="Relatório em Power BI com 188 medidas DAX: fila por máquina, prazo real por rota de produção e Curva ABC de clientes.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/style.css"></head><body>
+<header class="site"><div class="wrap"><a class="brand" href="../index.html">Bárbara Paschoalin</a><button class="menu-btn" aria-expanded="false">Menu</button>
+<nav aria-label="Principal"><ul><li><a href="../index.html#competencias">Competências</a></li><li><a href="index.html" aria-current="page">Projetos</a></li><li><a href="../index.html#contato">Contato</a></li></ul></nav></div></header><main>
+<div class="wrap"><p class="crumb"><a href="index.html">Projetos</a> / Gestão integrada de pedidos, produção e carteira de clientes</p>
+<article class="read" style="padding:1.5rem 0 4rem">
+<span class="badge real">Projeto real</span>
+<h1 style="margin-top:.6rem">Gestão integrada de pedidos, produção e carteira de clientes</h1>
+<p class="lead">Relatório em Power BI que une pedidos, apontamentos de máquina, capacidade e faturamento em um único modelo de dados, para responder três perguntas: qual prazo é viável, quanto o prazo real difere do planejado e quais clientes sustentam a receita.</p>
+<div class="summary"><dl>
+<dt>Cenário</dt><dd>Indústria metalmecânica de corte e dobra de chapas (laser, plasma, guilhotina, oxicorte e dobra)</dd>
+<dt>O que construí</dt><dd>ETL em Power Query, modelo relacional, 188 medidas DAX e 6 páginas de relatório</dd>
+<dt>Natureza</dt><dd>Projeto autoral, por iniciativa própria, a partir de dados do ERP</dd>
+<dt>Imagens</dt><dd>Nomes de clientes e valores financeiros ocultados</dd></dl></div>
+<div class="status"><strong>Status do projeto</strong><dl>
+<dt>Implementei</dt><dd>Tratamento dos dados, modelo, medidas e as 6 páginas do relatório.</dd>
+<dt>Evolução</dt><dd>Reconstruí a lógica dos painéis em aplicação web (JavaScript), sem depender do Power BI Desktop.</dd></dl></div>
+
+<h2>Contexto</h2>
+<p>Vendas, produção (PCP) e faturamento dependiam de informações espalhadas entre apontamentos de chão de fábrica, ordens de serviço, cadastro de chapas e notas fiscais. Cada área via uma parte do processo.</p>
+<h2>Problema</h2>
+<p>O projeto se propôs a responder, com os mesmos dados e as mesmas regras, três perguntas:</p>
+<ul class="plain"><li>Qual prazo de entrega é viável, dada a fila de cada máquina?</li><li>Quanto tempo um item leva de fato, por tipo de rota (por exemplo, laser com dobra)?</li><li>Quão concentrada está a receita e quais clientes ficam no topo da Curva ABC?</li></ul>
+
+<h2>Abordagem</h2>
+<p>Dividi o trabalho em três camadas: tratar os dados na origem (Power Query), modelar as relações entre pedido, item, máquina, cliente e nota fiscal, e só então escrever as medidas DAX. Assim as regras de negócio ficam em um lugar só e os painéis apenas as exibem.</p>
+
+<h2>Análise e solução</h2>
+<h3>Tratamento dos dados (Power Query)</h3>
+<ul class="plain">
+<li>Extração da espessura da chapa a partir da descrição em texto livre, localizando o último "MM" e invertendo o texto para isolar o calibre.</li>
+<li>Chaves <code>Pedido_Linha</code> e <code>Item_Pedido</code>, para ligar cada item do pedido ao seu apontamento de corte e dobra.</li>
+<li>Conexão com a base em nuvem com parâmetro que evita cache, para os dados sempre refletirem a última atualização.</li>
+<li>Tabela de feriados para contar dias úteis e tabela de capacidade por máquina (kg por dia).</li></ul>
+<h3>Modelo de dados</h3>
+<p>Modelo relacional com fatos (pedidos, apontamentos de produção, itens e notas fiscais) e dimensões (clientes, vendedores, chapas, capacidade, categoria de prazo e calendário). A granularidade do item foi a decisão central, porque é nela que corte e dobra se encontram.</p>
+<h3>Medidas DAX</h3>
+<p>As 188 medidas se organizam em três grupos. Abaixo, um exemplo de cada.</p>
+<p><strong>Fila e gargalo.</strong> Dias de fila = peso pendente na máquina ÷ capacidade diária. Mais de 3 dias é crítico, de 1 a 3 é atenção e até 1 dia é normal. Para rotas com duas etapas, o prazo sugerido segue o caminho crítico:</p>
+<pre><code>Sugestao Laser + Dobra = MAX( [Fila LASER], [Fila DOBRA] )</code></pre>
+<p><strong>Prazo real por rota.</strong> Média do lead time dos itens finalizados, filtrada pelo tipo de corte e pela presença de dobra.</p>
+<details><summary>Ver a medida completa</summary><pre><code>Prazo Médio Real (dias) =
+VAR Cat = SELECTEDVALUE( Dim_Categoria_Prazo[Categoria] )
+RETURN
+AVERAGEX(
+    FILTER(
+        Itens_Resumo_Item,
+        Itens_Resumo_Item[Status_Final_Item] = "FINALIZADO"
+            &amp;&amp; (
+                Itens_Resumo_Item[Tipo_Corte] IN { "Laser", "Plasma", "Oxicorte" }
+                    &amp;&amp; Itens_Resumo_Item[Tem_Programacao] = "SIM"
+                || Itens_Resumo_Item[Tipo_Corte] = "Guilhotina"
+            )
+            &amp;&amp; SWITCH(
+                TRUE(),
+                Cat = "Laser + Dobra",  Itens_Resumo_Item[Tipo_Corte] = "Laser" &amp;&amp; Itens_Resumo_Item[Tem_Dobra] = "Sim",
+                Cat = "Laser",          Itens_Resumo_Item[Tipo_Corte] = "Laser" &amp;&amp; Itens_Resumo_Item[Tem_Dobra] &lt;&gt; "Sim",
+                Cat = "Plasma + Dobra", Itens_Resumo_Item[Tipo_Corte] = "Plasma" &amp;&amp; Itens_Resumo_Item[Tem_Dobra] = "Sim",
+                Cat = "Guilhotina",     Itens_Resumo_Item[Tipo_Corte] = "Guilhotina" &amp;&amp; Itens_Resumo_Item[Tem_Dobra] &lt;&gt; "Sim",
+                FALSE()
+            )
+    ),
+    Itens_Resumo_Item[LeadTime_Item_Dias]
+)</code></pre></details>
+<p><strong>Curva ABC.</strong> Ranking de clientes por faturamento, com corte de Pareto que o usuário alterna entre 60%, 70%, 80% e 90%, e variação de posição em relação ao ano anterior.</p>
+<pre><code>Rank Cliente ABC = RANKX( ALLSELECTED( Dim_Clientes ), [Faturamento Total], , DESC, DENSE )</code></pre>
+
+<h3>Painéis</h3>
+<p>O relatório tem 6 páginas: menu inicial, pedidos, indicadores, prazos, Curva ABC e uma página tática que cruza faturamento com a carga das máquinas. Quatro delas aparecem abaixo.</p>
+</article>
+<figure class="wide"><img src="../assets/img/pedidos.jpg" alt="Painel de pedidos com status de entrega e status por item" loading="lazy"><figcaption>Pedidos: situação de entrega por pedido e andamento de cada item no processo.</figcaption></figure>
+<figure class="wide"><img src="../assets/img/prazos.jpg" alt="Painel de prazos com pedidos por semana e prazo médio por tipo de processo" loading="lazy"><figcaption>Prazos: pedidos por semana, distribuição por status de prazo e prazo médio por tipo de processo.</figcaption></figure>
+<figure class="wide"><img src="../assets/img/indicadores.jpg" alt="Painel de indicadores de produção por espessura e por processo" loading="lazy"><figcaption>Indicadores: horas médias e itens produzidos por espessura de chapa e por processo.</figcaption></figure>
+<figure class="wide"><img src="../assets/img/curva-abc.jpg" alt="Painel de Curva ABC de clientes com corte de Pareto" loading="lazy"><figcaption>Curva ABC: concentração de faturamento por cliente, com corte de Pareto selecionável. Valores ocultados.</figcaption></figure>
+<article class="read" style="padding:0 0 4rem">
+<h2>O que o relatório permite</h2>
+<ul class="plain">
+<li>Ver, por máquina, quantos dias de fila existem e se a situação é normal, de atenção ou crítica.</li>
+<li>Sugerir um prazo de venda a partir do gargalo da rota, em vez de uma estimativa por intuição.</li>
+<li>Comparar o prazo real com o planejado por tipo de rota e identificar onde o processo demora mais.</li>
+<li>Mostrar quantos clientes concentram 80% do faturamento e quem subiu ou desceu no ranking.</li></ul>
+
+<h2>Aprendizados</h2>
+<ul class="plain">
+<li><strong>Granularidade primeiro.</strong> Definir o item do pedido como grão do modelo evitou contagens duplicadas ao cruzar pedido, corte e dobra.</li>
+<li><strong>Caminho crítico em rotas combinadas.</strong> Usar o maior valor entre as filas das etapas reflete melhor o prazo do que somá-las.</li>
+<li><strong>Limitações.</strong> A capacidade em kg por dia é nominal e não considera tempo de preparação nem complexidade da peça. A espessura depende de a descrição da chapa seguir um padrão.</li>
+<li><strong>Evoluções possíveis.</strong> Mover regras de negócio para uma camada de dados em SQL e testar as medidas com um conjunto de casos conhecidos.</li></ul>
+
+<h2>Código e demonstração</h2>
+<p>O arquivo e a base são da empresa e não são públicos. Um estudo com dados 100% sintéticos, que reproduz esse tipo de análise, será o próximo projeto deste portfólio.</p>
+</article></div></main>
+<footer class="site"><div class="wrap">© 2026 Bárbara Cabral Paschoalin. Maringá, PR. Imagens de projetos reais têm nomes e valores ocultados.</div></footer><script src="../assets/js/main.js"></script></body></html>

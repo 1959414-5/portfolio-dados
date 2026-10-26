@@ -1,0 +1,92 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "4c7d48d9360a47b8a7cf",
+  "position": {
+    "x": 660,
+    "y": 470,
+    "z": 90,
+    "width": 600,
+    "height": 240,
+    "tabOrder": 90
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Dim_Calendario"
+                    }
+                  },
+                  "Property": "MesAno"
+                }
+              },
+              "queryRef": "Dim_Calendario.MesAno",
+              "nativeQueryRef": "MesAno"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fato_Titulos"
+                    }
+                  },
+                  "Property": "Valor Faturado"
+                }
+              },
+              "queryRef": "Fato_Titulos.Valor Faturado",
+              "nativeQueryRef": "Valor Faturado"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fato_Titulos"
+                    }
+                  },
+                  "Property": "Valor Recebido"
+                }
+              },
+              "queryRef": "Fato_Titulos.Valor Recebido",
+              "nativeQueryRef": "Valor Recebido"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Faturado e recebido por mês de emissão'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

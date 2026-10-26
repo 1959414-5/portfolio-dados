@@ -1,0 +1,12 @@
+model Model
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+
+ref expression PastaDados
+ref table Dim_Calendario
+ref table Dim_Cliente
+ref table Dim_Produto
+ref table Dim_Vendedor
+ref table Fato_Vendas
+ref table Fato_Titulos
+ref table Fato_Metas

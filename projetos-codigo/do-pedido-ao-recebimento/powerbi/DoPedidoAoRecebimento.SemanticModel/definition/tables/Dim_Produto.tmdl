@@ -1,0 +1,45 @@
+table Dim_Produto
+	lineageTag: 333e6e19-4c3d-480a-a4b0-13160dde0d62
+
+	column ProdutoID
+		dataType: int64
+		formatString: 0
+		lineageTag: 73118c12-130a-4464-b459-d1ef57c60fda
+		summarizeBy: none
+		sourceColumn: ProdutoID
+
+	column Produto
+		dataType: string
+		lineageTag: 0f6fe4af-0a35-4065-976b-174a1634ad69
+		summarizeBy: none
+		sourceColumn: Produto
+
+	column Categoria
+		dataType: string
+		lineageTag: f8ad4d04-71a4-4d83-abbf-df4a03cab58a
+		summarizeBy: none
+		sourceColumn: Categoria
+
+	column CustoUnitario
+		dataType: double
+		formatString: #,0.00
+		lineageTag: 96da3c16-d540-4fbb-8785-5099a09e29b6
+		summarizeBy: none
+		sourceColumn: CustoUnitario
+
+	column PrecoLista
+		dataType: double
+		formatString: #,0.00
+		lineageTag: c8089e9b-5912-4d6e-a331-872e79ea1794
+		summarizeBy: none
+		sourceColumn: PrecoLista
+
+	partition Dim_Produto = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents(PastaDados & "dim_produto.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Cabecalho = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    Tipos = Table.TransformColumnTypes(Cabecalho, {{"ProdutoID", Int64.Type}, {"Produto", type text}, {"Categoria", type text}, {"CustoUnitario", type number}, {"PrecoLista", type number}}, "en-US")
+				in
+				    Tipos

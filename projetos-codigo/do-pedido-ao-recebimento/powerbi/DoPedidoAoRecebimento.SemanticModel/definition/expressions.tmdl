@@ -1,0 +1,4 @@
+expression PastaDados = "C:\Users\Barbara\Documents\portfolio-dados\portfolio-dados\projetos-codigo\do-pedido-ao-recebimento\dados\" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 17c30abc-c0e9-454f-bd7e-685aa9f83361
+
+	annotation PBI_ResultType = Text

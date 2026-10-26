@@ -1,0 +1,78 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "ace30fb5be924877a5d8",
+  "position": {
+    "x": 20,
+    "y": 210,
+    "z": 60,
+    "width": 620,
+    "height": 250,
+    "tabOrder": 60
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fato_Titulos"
+                    }
+                  },
+                  "Property": "FaixaAtraso"
+                }
+              },
+              "queryRef": "Fato_Titulos.FaixaAtraso",
+              "nativeQueryRef": "FaixaAtraso"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fato_Titulos"
+                    }
+                  },
+                  "Property": "Valor em Aberto"
+                }
+              },
+              "queryRef": "Fato_Titulos.Valor em Aberto",
+              "nativeQueryRef": "Valor em Aberto"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Contas em aberto por faixa de atraso'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

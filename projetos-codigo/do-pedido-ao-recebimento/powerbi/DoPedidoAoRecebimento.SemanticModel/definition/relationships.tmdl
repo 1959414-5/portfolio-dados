@@ -1,0 +1,31 @@
+relationship b2f3e0e0-2ddc-4424-9852-14cd47cfb894
+	fromColumn: Fato_Vendas.ClienteID
+	toColumn: Dim_Cliente.ClienteID
+
+relationship 41551b74-9bd1-4abf-a50e-c36c8a6d4f75
+	fromColumn: Fato_Vendas.VendedorID
+	toColumn: Dim_Vendedor.VendedorID
+
+relationship dd328550-a152-453b-8123-de4e8b1ae8f6
+	fromColumn: Fato_Vendas.ProdutoID
+	toColumn: Dim_Produto.ProdutoID
+
+relationship c6765086-3955-4a5e-9d01-60c88a41a19b
+	fromColumn: Fato_Vendas.Data
+	toColumn: Dim_Calendario.Data
+
+relationship 7daa0e7e-6896-48a8-96f4-5dca4b0bb1ba
+	fromColumn: Fato_Titulos.ClienteID
+	toColumn: Dim_Cliente.ClienteID
+
+relationship 4ec3eff2-cc38-4cc1-ae11-a03cdaeb9ef2
+	fromColumn: Fato_Titulos.DataEmissao
+	toColumn: Dim_Calendario.Data
+
+relationship 0670314a-d783-441b-a37e-c248d3c1cbdf
+	fromColumn: Fato_Metas.VendedorID
+	toColumn: Dim_Vendedor.VendedorID
+
+relationship 46f0c283-ffc1-44ac-a71d-fa985c4503e0
+	fromColumn: Fato_Metas.DataMes
+	toColumn: Dim_Calendario.Data

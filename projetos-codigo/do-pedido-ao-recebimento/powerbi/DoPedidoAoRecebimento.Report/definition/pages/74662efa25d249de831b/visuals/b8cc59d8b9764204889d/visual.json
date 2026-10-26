@@ -1,0 +1,38 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.1.0/schema.json",
+  "name": "b8cc59d8b9764204889d",
+  "position": {
+    "x": 950,
+    "y": 90,
+    "z": 50,
+    "width": 290,
+    "height": 100,
+    "tabOrder": 50
+  },
+  "visual": {
+    "visualType": "card",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Fato_Vendas"
+                    }
+                  },
+                  "Property": "Atingimento da Meta %"
+                }
+              },
+              "queryRef": "Fato_Vendas.Atingimento da Meta %",
+              "nativeQueryRef": "Atingimento da Meta %"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,68 @@
+table Dim_Calendario
+	lineageTag: 46428418-8d66-43ed-aac6-75c23683bb03
+	dataCategory: Time
+
+	column Data
+		dataType: dateTime
+		formatString: dd/mm/yyyy
+		isKey
+		lineageTag: cd439f21-1d2a-4749-a67a-45a8c1596e81
+		summarizeBy: none
+		sourceColumn: Data
+
+	column Ano
+		dataType: int64
+		formatString: 0
+		lineageTag: fa298da9-dda8-41a7-925b-4a5e101f95a3
+		summarizeBy: none
+		sourceColumn: Ano
+
+	column MesNum
+		dataType: int64
+		formatString: 0
+		lineageTag: 580a4516-615b-4ffe-9e8f-c3b494dc82b0
+		summarizeBy: none
+		sourceColumn: MesNum
+
+	column NomeMes
+		dataType: string
+		lineageTag: 0875ae7e-0e7d-494b-8493-bd1719729379
+		summarizeBy: none
+		sourceColumn: NomeMes
+		sortByColumn: MesNum
+
+	column MesAno
+		dataType: string
+		lineageTag: 247c3ac0-2393-4f36-b239-c89b11f36296
+		summarizeBy: none
+		sourceColumn: MesAno
+		sortByColumn: AnoMes
+
+	column AnoMes
+		dataType: int64
+		formatString: 0
+		lineageTag: 21caa2bb-45eb-427f-ba9e-484195cf2510
+		summarizeBy: none
+		sourceColumn: AnoMes
+
+	column Trimestre
+		dataType: string
+		lineageTag: c9098db6-c4c2-48fc-b09c-23fd83965e2a
+		summarizeBy: none
+		sourceColumn: Trimestre
+
+	column DiaSemana
+		dataType: string
+		lineageTag: 4c5dec17-e3b1-4ad5-b5b7-489595cede27
+		summarizeBy: none
+		sourceColumn: DiaSemana
+
+	partition Dim_Calendario = m
+		mode: import
+		source =
+				let
+				    Fonte = Csv.Document(File.Contents(PastaDados & "dim_calendario.csv"), [Delimiter=",", Encoding=65001, QuoteStyle=QuoteStyle.Csv]),
+				    Cabecalho = Table.PromoteHeaders(Fonte, [PromoteAllScalars=true]),
+				    Tipos = Table.TransformColumnTypes(Cabecalho, {{"Data", type date}, {"Ano", Int64.Type}, {"MesNum", Int64.Type}, {"NomeMes", type text}, {"MesAno", type text}, {"AnoMes", Int64.Type}, {"Trimestre", type text}, {"DiaSemana", type text}}, "en-US")
+				in
+				    Tipos

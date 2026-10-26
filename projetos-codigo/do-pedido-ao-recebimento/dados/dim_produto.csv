@@ -1,0 +1,49 @@
+ProdutoID,Produto,Categoria,CustoUnitario,PrecoLista
+1,Cabos Linha Básica,Cabos e Fios,89.34,144.96
+2,Cabos Linha Plus,Cabos e Fios,99.88,158.08
+3,Cabos Linha Pro,Cabos e Fios,25.68,39.6
+4,Cabos Linha Industrial,Cabos e Fios,91.1,142.98
+5,Cabos Linha Compacta,Cabos e Fios,27.68,44.86
+6,Cabos Linha Premium,Cabos e Fios,53.24,82.47
+7,Cabos Linha Econômica,Cabos e Fios,79.79,124.8
+8,Cabos Linha Reforçada,Cabos e Fios,56.58,93.73
+9,Iluminação Linha Básica,Iluminação,114.9,207.47
+10,Iluminação Linha Plus,Iluminação,173.34,294.84
+11,Iluminação Linha Pro,Iluminação,155.72,272.59
+12,Iluminação Linha Industrial,Iluminação,205.59,340.62
+13,Iluminação Linha Compacta,Iluminação,156.75,279.08
+14,Iluminação Linha Premium,Iluminação,99.11,179.35
+15,Iluminação Linha Econômica,Iluminação,46.91,79.37
+16,Iluminação Linha Reforçada,Iluminação,163.15,268.32
+17,Quadros Linha Básica,Quadros e Disjuntores,116.31,196.4
+18,Quadros Linha Plus,Quadros e Disjuntores,154.29,265.39
+19,Quadros Linha Pro,Quadros e Disjuntores,61.27,102.36
+20,Quadros Linha Industrial,Quadros e Disjuntores,90.87,148.92
+21,Quadros Linha Compacta,Quadros e Disjuntores,154.88,249.83
+22,Quadros Linha Premium,Quadros e Disjuntores,221.44,376.13
+23,Quadros Linha Econômica,Quadros e Disjuntores,271.72,439.48
+24,Quadros Linha Reforçada,Quadros e Disjuntores,132.72,225.99
+25,Ferramentas Linha Básica,Ferramentas,184.13,297.76
+26,Ferramentas Linha Plus,Ferramentas,68.35,111.96
+27,Ferramentas Linha Pro,Ferramentas,219.64,337.97
+28,Ferramentas Linha Industrial,Ferramentas,201.32,306.49
+29,Ferramentas Linha Compacta,Ferramentas,136.35,211.68
+30,Ferramentas Linha Premium,Ferramentas,54.79,88.82
+31,Ferramentas Linha Econômica,Ferramentas,186.59,292.34
+32,Ferramentas Linha Reforçada,Ferramentas,165.69,252.62
+33,Tubos Linha Básica,Tubos e Conexões,87.21,105.94
+34,Tubos Linha Plus,Tubos e Conexões,76.59,94.76
+35,Tubos Linha Pro,Tubos e Conexões,13.52,16.56
+36,Tubos Linha Industrial,Tubos e Conexões,35.64,43.76
+37,Tubos Linha Compacta,Tubos e Conexões,111.2,138.3
+38,Tubos Linha Premium,Tubos e Conexões,16.65,20.63
+39,Tubos Linha Econômica,Tubos e Conexões,46.01,55.45
+40,Tubos Linha Reforçada,Tubos e Conexões,79.05,94.44
+41,Automação Linha Básica,Automação,310.52,628.09
+42,Automação Linha Plus,Automação,359.71,749.36
+43,Automação Linha Pro,Automação,51.53,108.4
+44,Automação Linha Industrial,Automação,336.01,675.11
+45,Automação Linha Compacta,Automação,110.33,220.63
+46,Automação Linha Premium,Automação,109.2,213.37
+47,Automação Linha Econômica,Automação,222.47,451.39
+48,Automação Linha Reforçada,Automação,169.72,334.22
